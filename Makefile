@@ -25,11 +25,9 @@ INCLUDES	=	-I ./includes -I $(LIBFT_DIR)/includes -I $(OS_DIR)/includes
 # OS differences
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S), Darwin)
-	OS_DIR		=	$(LIBFT_DIR)/mac
-	INCLUDES	+=	-I/opt/homebrew/opt/readline/include
-	LDFLAGS		+=	-L/opt/homebrew/opt/readline/lib -lreadline
+
 else
-	OS_DIR		=	$(LIBFT_DIR)/linux
+
 endif
 
 
@@ -54,7 +52,7 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@echo "$(BOLD)$(LIGHT_BLUE)Compiling $(NAME)...$(RESET)"
-	@$(CC) $(OBJS) -o $(NAME) $(LDFLAGS)
+	@$(CC) $(OBJS) -o $(NAME)
 	@echo "$(BOLD)$(LIGHT_BLUE)$(NAME) created successfully!$(RESET)"
 
 %.o: %.c
