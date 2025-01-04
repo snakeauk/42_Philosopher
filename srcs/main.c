@@ -1,5 +1,10 @@
 #include "philo.h"
 
+void    error_exit(char *message)
+{
+    printf(RED"%s", message);
+    exit(EXIT_FAILURE);
+}
 // number_of_philosophers,
 // time_to_die,
 // time_to_eat,
