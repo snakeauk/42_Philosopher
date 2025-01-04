@@ -3,6 +3,7 @@ NAME		=	philo
 # commands
 CC			=	cc
 CFLAGS		=	-g# -Wall -Wextra -Werror
+CFLAGS		+=	-pthread
 RM			=	rm -rf
 MAKEFLAGS	+=	--no-print-directory
 
@@ -17,19 +18,11 @@ LEXER_SRCS	=	$(wildcard $(LEXER_DIR)/*.c)
 SRCS		=	$(SRCS_COMMON) $(BUILTIN_SRCS) $(LEXER_SRCS)
 
 # object
-OBJS	=	$(SRCS:.c=.o)
+OBJS_DIR	=	./objs
+OBJS		=	$(SRCS:$(SRCS_DIR)/%.c=$(OBJS_DIR)/%.o)
 
 # includes
 INCLUDES	=	-I ./includes -I $(LIBFT_DIR)/includes -I $(OS_DIR)/includes
-
-# OS differences
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S), Darwin)
-
-else
-
-endif
-
 
 # font color
 RESET		=	\033[0m
@@ -41,34 +34,34 @@ YELLOW		=	\033[93m
 TOTAL_FILES := $(words $(OBJS) $(SERVER_OBJS))
 CURRENT_FILE := 0
 
+# rule
 define progress
 	@CURRENT_PERCENT=$$(expr $(CURRENT_FILE) \* 100 / $(TOTAL_FILES)); \
-	printf "$(YELLOW)Progress: %3d%% (%d/%d)$(RESET)\r" $$CURRENT_PERCENT $(CURRENT_FILE) $(TOTAL_FILES); \
-	$(eval CURRENT_FILE=$$(($(CURRENT_FILE)+1)))
+	printf "$(YELLOW)Progress: %3d%% (%d/%d)$(RESET)\r" $$CURRENT_PERCENT $(CURRENT_FILE) $(TOTAL_FILES)
 endef
 
-# rule
 all: $(NAME)
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS_DIR) $(OBJS)
 	@echo "$(BOLD)$(LIGHT_BLUE)Compiling $(NAME)...$(RESET)"
-	@$(CC) $(OBJS) -o $(NAME)
+	@$(CC) $(OBJS) $(LIBS) -o $(NAME)
 	@echo "$(BOLD)$(LIGHT_BLUE)$(NAME) created successfully!$(RESET)"
 
-%.o: %.c
-	@$(eval CURRENT_FILE=$(shell expr $(CURRENT_FILE) + 1))
-	@CURRENT_PERCENT=$$(expr $(CURRENT_FILE) \* 100 / $(TOTAL_FILES)); \
-	printf "$(YELLOW)Progress: %3d%% (%d/%d)$(RESET)\r" $$CURRENT_PERCENT $(CURRENT_FILE) $(TOTAL_FILES); \
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+$(OBJS_DIR)/%.o: $(SRCS_DIR)/%.c | $(OBJS_DIR)
+	@$(progress)
+	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+$(OBJS_DIR):
+	@mkdir -p $(OBJS_DIR)
 
 clean:
 	@echo "$(BOLD)$(LIGHT_BLUE)Cleaning objects...$(RESET)"
-	@$(RM) $(OBJS)
+	@$(RM) $(OBJS) $(OBJS_DIR)
 	@echo "$(BOLD)$(LIGHT_BLUE)Objects cleaned!$(RESET)"
 
 fclean:
 	@echo "$(BOLD)$(LIGHT_BLUE)Full clean...$(RESET)"
-	@$(RM) $(OBJS) $(NAME)
+	@$(RM) $(OBJS) $(OBJS_DIR) $(NAME)
 	@echo "$(BOLD)$(LIGHT_BLUE)Full clean complete!$(RESET)"
 
 re: fclean all
