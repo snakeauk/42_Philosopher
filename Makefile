@@ -9,13 +9,11 @@ MAKEFLAGS	+=	--no-print-directory
 
 # srcs
 SRCS_DIR	=	./srcs
-BUILTIN_DIR	=	$(SRCS_DIR)/builtin
-LEXER_DIR	=	$(SRCS_DIR)/lexer
+UTILS_DIR	=	$(SRCS_DIR)/utils
 
 SRCS_COMMON	=	$(wildcard $(SRCS_DIR)/*.c)
-BUILTIN_SRCS=	$(wildcard $(BUILTIN_DIR)/*.c)
-LEXER_SRCS	=	$(wildcard $(LEXER_DIR)/*.c)
-SRCS		=	$(SRCS_COMMON) $(BUILTIN_SRCS) $(LEXER_SRCS)
+BUILTIN_SRCS=	$(wildcard $(UTILS_DIR)/*.c)
+SRCS		=	$(SRCS_COMMON) $(BUILTIN_SRCS)
 
 # object
 OBJS_DIR	=	./objs
@@ -53,6 +51,7 @@ $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.c | $(OBJS_DIR)
 
 $(OBJS_DIR):
 	@mkdir -p $(OBJS_DIR)
+	@mkdir -p $(OBJS_DIR)/$(UTILS_DIR)
 
 clean:
 	@echo "$(BOLD)$(LIGHT_BLUE)Cleaning objects...$(RESET)"
