@@ -2,7 +2,7 @@ NAME		=	philo
 
 # commands
 CC			=	cc
-CFLAGS		=	-g# -Wall -Wextra -Werror
+CFLAGS		=	-g -Wall -Wextra -Werror
 CFLAGS		+=	-pthread
 RM			=	rm -rf
 MAKEFLAGS	+=	--no-print-directory
@@ -66,3 +66,11 @@ fclean:
 re: fclean all
 
 .PHONY: all clean fclean re
+
+run: all
+	@./$(NAME)
+
+valgrind: all
+	@valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(NAME)
+
+.PHONY: run valgrind
