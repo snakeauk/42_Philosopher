@@ -23,6 +23,7 @@ long    set_eat_time(t_philo *philo)
     t_table *table;
     long    eat_time;
 
+    eat_time = 0;
     table = philo->table;
     if (table->philo_nbr % 2 == 0)
     {
@@ -33,7 +34,7 @@ long    set_eat_time(t_philo *philo)
     }
     else
     {
-        
+        eat_time = table->time_to_eat;
     }
     return (eat_time);
 }
@@ -54,32 +55,35 @@ void    init_forks(t_table *table)
 void    init_philo_values(t_table *table)
 {
     int index;
+    t_philo *philo;
 
     index = 0;
     while (index < table->philo_nbr)
     {
-        table->philos[index].id = index + 1;
-        table->philos[index].meals_counter = 0;
-        table->philos[index].last_meal_time = 0;
-        table->philos[index].last_sleep_time = 0;
-        table->philos[index].next_eat_time = set_eat_time(&table->philos[index]);
-        table->philos[index].state = SLEEPING;
-        table->philos[index].table = table;
+        philo = &table->philos[index];
+        philo->id = index + 1;
+        philo->meals_counter = 0;
+        philo->last_meal_time = 0;
+        philo->last_sleep_time = 0;
+        philo->next_eat_time = set_eat_time(philo);
+        philo->state = SLEEPING;
+        philo->is_set = false;
+        philo->table = table;
         if (index == 0)
         {
-            table->philos[index].first_fork = &table->forks[table->philo_nbr - 1];
-            table->philos[index].second_fork = &table->forks[index];
+            philo->first_fork = &table->forks[table->philo_nbr - 1];
+            philo->second_fork = &table->forks[index];
         }
         else
         {
-            table->philos[index].first_fork = &table->forks[index - 1];
-            table->philos[index].second_fork = &table->forks[index];
+            philo->first_fork = &table->forks[index - 1];
+            philo->second_fork = &table->forks[index];
         }
         index++;
     }
 }
 
-int *init_table(t_table *table)
+void init_table(t_table *table)
 {
     table->forks = (t_fork *)malloc(sizeof(t_fork) * table->philo_nbr);
     table->philos = (t_philo *)malloc(sizeof(t_philo) * table->philo_nbr);
@@ -88,6 +92,4 @@ int *init_table(t_table *table)
     table->interval = init_interval(table);
     init_philo_values(table);
     init_forks(table);
-    init_philo(table);
-    return (EXIT_SUCCESS);
 }
