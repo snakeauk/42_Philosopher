@@ -15,6 +15,7 @@ bool    is_continue(t_table *table)
         if (table->philos[index].state == DEAD)
         {
             is_dead = true;
+            philo_log(&table->philos[index], "is dead");
             ft_mutex_unlock(&table->philos[index].philo_mutex);
             break;
         }
@@ -22,27 +23,49 @@ bool    is_continue(t_table *table)
             is_end = true;
         ft_mutex_unlock(&table->philos[index].philo_mutex);
     }
-    // if (is_dead)
-    // {
-    //     philo_log(&table->philos[index], "is dead");
-    //     set_bool(&table->monitor.monitor_mutex, &table->monitor.simulation_continue, false);
-    // }
+    if (!is_dead || !is_end)
+        return (true);
+    return (false);
+}
 
+void    check_start(t_table *table)
+{
+    int     index;
+    t_philo *philo;
+    bool    status;
+    bool    start;
+
+    index = 0;
+    while (start)
+    {
+        start = false;
+        while (index < table->philo_nbr)
+        {
+            status = false;
+            philo = &table->philos[index];
+            ft_mutex_lock(&philo->philo_mutex);
+            status = philo->is_set;
+            if (status == false)
+                start = true;
+            ft_mutex_unlock(&philo->philo_mutex);
+            index++;
+        }
+    }
+    table->start_time = get_time("ms");
 }
 
 void    *monitor_routine(void *arg)
 {
     t_table *table;
     t_monitor *monitor;
-    bool    simulation_continue;
 
     table = (t_table *)arg;
     monitor = &table->monitor;
-    monitor->simulation_continue = true;
-    while (simulation_continue)
+    check_start(table);
+    while (get_bool(&monitor->monitor_mutex, &monitor->simulation_continue))
     {
         usleep(1000);
-        simulation_continue = is_continue(table);
+        set_bool(&table->monitor.monitor_mutex, &table->monitor.simulation_continue, is_continue(table));
     }
     return (NULL);
 }

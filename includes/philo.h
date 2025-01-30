@@ -38,6 +38,7 @@ typedef struct s_philo
     long            last_meal_time;
     long            last_sleep_time;
     long            next_eat_time;
+    bool            is_set;
     t_state         state;
     t_fork          *first_fork;
     t_fork          *second_fork;
@@ -71,13 +72,18 @@ typedef struct s_table
 
 // main.c
 void        error_exit(char *message, t_table *table);
+int         error_message(char *message);
 int         main(int argc, char **argv);
 
 // init_arg.c
 int    init_arg(t_table *table, char **argv);
 
 // init_table.c
-t_table     *init_table(int argc, char **argv);
+void init_table(t_table *table);
+
+
+// simulation.c
+void    simulation(t_table *table);
 
 // check.c
 int         check_input(int argc, char **argv);
@@ -86,7 +92,12 @@ int         check_input(int argc, char **argv);
 void        free_table(t_table *table);
 
 // philo.c
+int     philo_log(t_philo *philo, char *message);
 void    philo_set(t_table *table);
+
+// monitor.c
+void    *monitor_set(t_table *table);
+
 
 
 #endif
