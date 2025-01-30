@@ -67,10 +67,10 @@ re: fclean all
 
 .PHONY: all clean fclean re
 
-run: all
+run: $(NAME)
 	@./$(NAME)
 
-valgrind: all
+valgrind: $(NAME)
 	@valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(NAME)
 
 .PHONY: run valgrind
