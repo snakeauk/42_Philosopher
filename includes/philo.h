@@ -15,7 +15,6 @@
 typedef pthread_mutex_t t_mutex;
 typedef struct s_table  t_table;
 
-
 typedef enum e_state
 {
     THINKING,
@@ -26,42 +25,45 @@ typedef enum e_state
 
 typedef struct s_fork
 {
-    t_mutex fork;
     int     fork_id;
+    t_mutex fork;
 }               t_fork;
 
 typedef struct s_philo
 {
+    pthread_t       thread_id;
+    t_mutex         philo_mutex;
     int             id;
-    t_fork          *first_fork;
-    t_fork          *second_fork;
     long            meals_counter;
     long            last_meal_time;
-    t_mutex         philo_mutex;
-    pthread_t       thread_id;
-    t_table         *table;
+    long            last_sleep_time;
+    long            next_eat_time;
     t_state         state;
+    t_fork          *first_fork;
+    t_fork          *second_fork;
+    t_table         *table;
 }               t_philo;
 
 typedef struct s_monitor
 {
     pthread_t   thread_id;
-    t_mutex     mutex;
+    t_mutex     monitor_mutex;
     bool        is_dead;
+    bool        simulation_continue;
 }           t_monitor;
-
 
 typedef struct s_table
 {
-    long    philo_nbr;
-    long    time_to_die;
-    long    time_to_eat;
-    long    time_to_sleep;
-    long    nbr_limit_meals;
-    t_mutex table_mutex;
-    bool    simulation_continue;
-    t_fork  *forks;
-    t_philo *philos;
+    long        philo_nbr;
+    long        time_to_die;
+    long        time_to_eat;
+    long        time_to_sleep;
+    long        limit_meals;
+    long        start_time;
+    long        interval;
+    t_monitor   monitor;
+    t_philo     *philos;
+    t_fork      *forks;
 }               t_table;
 
 # define RESET    "\033[0m"   // Reset to default color
@@ -71,6 +73,9 @@ typedef struct s_table
 void        error_exit(char *message, t_table *table);
 int         main(int argc, char **argv);
 
+// init_arg.c
+int    init_arg(t_table *table, char **argv);
+
 // init_table.c
 t_table     *init_table(int argc, char **argv);
 
@@ -79,5 +84,9 @@ int         check_input(int argc, char **argv);
 
 // free.c
 void        free_table(t_table *table);
+
+// philo.c
+void    philo_set(t_table *table);
+
 
 #endif

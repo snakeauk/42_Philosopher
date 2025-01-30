@@ -1,96 +1,93 @@
 #include "philo.h"
 
-void set_forks(t_philo *philo, t_fork *forks, int index)
+long    init_interval(t_table *table)
 {
-    int philo_nbr;
+    long interval;
+    long philo_nbr;
+    long time_to_eat;
+    long time_to_sleep;
+    
+    philo_nbr = table->philo_nbr;
+    time_to_eat = table->time_to_eat;
+    time_to_sleep = table->time_to_sleep;
+    if ((philo_nbr / 2) == 0)
+        return (time_to_eat + time_to_sleep);
+    interval = time_to_eat * 2;
+    if (interval < time_to_eat + time_to_sleep)
+        return (time_to_eat + time_to_sleep);
+    return (interval);
+}
 
-    philo_nbr = philo->table->philo_nbr;
-    if (index % 2 == 0)
+long    set_eat_time(t_philo *philo)
+{
+    t_table *table;
+    long    eat_time;
+
+    table = philo->table;
+    if (table->philo_nbr % 2 == 0)
     {
-        philo->first_fork = &forks[index];
-        philo->second_fork = &forks[(index + 1) % philo_nbr];
+        if (philo->id % 2 == 0)
+            eat_time = table->time_to_eat;
+        else
+            eat_time = 0;
     }
     else
     {
-        philo->first_fork = &forks[(index + 1) % philo_nbr];
-        philo->second_fork = &forks[index];
+        
     }
-}
-
-void    init_philo(t_table *table)
-{
-    int index;
-    t_philo *philo;
-
-    if (!table)
-        error_exit("Error: table is NULL", table);
-    index = 0;
-    while (index < table->philo_nbr)
-    {
-        philo = &table->philos[index];
-        philo->id = index + 1;
-        philo->full = false;
-        philo->meals_counter = 0;
-        philo->table = table;
-        set_forks(philo, table->forks, index);
-        if (philo->id % 2 == 0)
-            philo->state = THINKING;
-        else
-            philo->state = EATING;
-        index++;
-    }
+    return (eat_time);
 }
 
 void    init_forks(t_table *table)
 {
     int index;
 
-    if (!table)
-        error_exit("Error: table is NULL", table);
     index = 0;
     while (index < table->philo_nbr)
     {
         table->forks[index].fork_id = index;
+        ft_mutex_init(&table->forks[index].fork);
         index++;
     }
 }
 
-void    init_env(t_table *table)
+void    init_philo_values(t_table *table)
 {
-    table->philos = (t_philo *)malloc(sizeof(t_philo) * table->philo_nbr);
+    int index;
+
+    index = 0;
+    while (index < table->philo_nbr)
+    {
+        table->philos[index].id = index + 1;
+        table->philos[index].meals_counter = 0;
+        table->philos[index].last_meal_time = 0;
+        table->philos[index].last_sleep_time = 0;
+        table->philos[index].next_eat_time = set_eat_time(&table->philos[index]);
+        table->philos[index].state = SLEEPING;
+        table->philos[index].table = table;
+        if (index == 0)
+        {
+            table->philos[index].first_fork = &table->forks[table->philo_nbr - 1];
+            table->philos[index].second_fork = &table->forks[index];
+        }
+        else
+        {
+            table->philos[index].first_fork = &table->forks[index - 1];
+            table->philos[index].second_fork = &table->forks[index];
+        }
+        index++;
+    }
+}
+
+int *init_table(t_table *table)
+{
     table->forks = (t_fork *)malloc(sizeof(t_fork) * table->philo_nbr);
-    if (!table->philos || !table->forks)
+    table->philos = (t_philo *)malloc(sizeof(t_philo) * table->philo_nbr);
+    if (!table->forks || !table->philos)
         error_exit("Error: malloc failed", table);
+    table->interval = init_interval(table);
+    init_philo_values(table);
     init_forks(table);
     init_philo(table);
-}
-
-static  void    init_table_value(t_table *table, char **argv)
-{
-    table->philo_nbr = ft_atol(argv[1]);
-    table->time_to_die = ft_atol(argv[2]) * 1000;
-    table->time_to_eat = ft_atol(argv[3]) * 1000;
-    table->time_to_sleep = ft_atol(argv[4]) * 1000;
-    if (argv[5])
-        table->nbr_limit_meals = ft_atol(argv[5]);
-    else
-        table->nbr_limit_meals = -1;
-    if (table->philo_nbr < 1)
-        error_exit("Error: number of philosophers must be at least 1", table);
-    if (table->time_to_die < 60 || table->time_to_eat < 60 || table->time_to_sleep < 60)
-        error_exit("Error: times must be greater than 60ms", table);
-}
-
-t_table *init_table(int argc, char **argv)
-{
-    t_table *table;
-
-    if (!check_input(argc, argv))
-        return (NULL);
-    table = (t_table *)malloc(sizeof(t_table));
-    if (!table)
-        exit(EXIT_FAILURE);
-    init_table_value(table, argv);
-    init_env(table);
-    return (table);
+    return (EXIT_SUCCESS);
 }
