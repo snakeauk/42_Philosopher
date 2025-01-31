@@ -1,76 +1,103 @@
-NAME		=	philo
+# **************************************************************************** #
+#                                  VARIABLES                                   #
+# **************************************************************************** #
 
-# commands
-CC			=	cc
-CFLAGS		=	-g -Wall -Wextra -Werror
-CFLAGS		+=	-pthread
-RM			=	rm -rf
+# Project
+NAME        = philo
+
+# Compiler and Flags
+CC          = cc
+CFLAGS      = -Wall -Wextra -Werror -pthread
+
+# Directories
 MAKEFLAGS	+=	--no-print-directory
 
 # srcs
 SRCS_DIR	=	./srcs
 UTILS_DIR	=	$(SRCS_DIR)/utils
-
-SRCS_COMMON	=	$(wildcard $(SRCS_DIR)/*.c)
-BUILTIN_SRCS=	$(wildcard $(UTILS_DIR)/*.c)
-SRCS		=	$(SRCS_COMMON) $(BUILTIN_SRCS)
+UTILS_SRCS	=	$(wildcard $(UTILS_DIR)/*.c)
+MAN_SRCS	=	$(SRCS_DIR)/check.c \
+				$(SRCS_DIR)/free.c \
+				$(SRCS_DIR)/init_arg.c \
+				$(SRCS_DIR)/init_mutex.c \
+				$(SRCS_DIR)/init_table.c \
+				$(SRCS_DIR)/main.c \
+				$(SRCS_DIR)/monitor.c \
+				$(SRCS_DIR)/philo.c \
+				$(SRCS_DIR)/simulation.c
+SRCS		=	$(UTILS_SRCS) $(MAN_SRCS)
 
 # object
 OBJS_DIR	=	./objs
 OBJS		=	$(SRCS:$(SRCS_DIR)/%.c=$(OBJS_DIR)/%.o)
 
-# includes
-INCLUDES	=	-I ./includes -I $(LIBFT_DIR)/includes -I $(OS_DIR)/includes
+# Includes
+INCLUDES    = -I ./includes
 
-# font color
-RESET		=	\033[0m
-BOLD		=	\033[1m
-LIGHT_BLUE	=	\033[94m
-YELLOW		=	\033[93m
+# Tools
+RM          = rm -rf
 
-# extra rule
-TOTAL_FILES := $(words $(OBJS) $(SERVER_OBJS))
-CURRENT_FILE := 0
+# **************************************************************************** #
+#                                   COLORS                                     #
+# **************************************************************************** #
+RESET       = \033[0m
+BOLD        = \033[1m
+LIGHT_BLUE  = \033[94m
+YELLOW      = \033[93m
 
-# rule
+# **************************************************************************** #
+#                                PROGRESS BAR                                  #
+# **************************************************************************** #
+# Simple progress approach: define a variable with total, increment on each .o.
+TOTAL_FILES := $(words $(OBJS))
+COMPILED    = 0
+
 define progress
-	@CURRENT_PERCENT=$$(expr $(CURRENT_FILE) \* 100 / $(TOTAL_FILES)); \
-	printf "$(YELLOW)Progress: %3d%% (%d/%d)$(RESET)\r" $$CURRENT_PERCENT $(CURRENT_FILE) $(TOTAL_FILES)
+	@$(eval COMPILED=$(shell echo $$(expr $(COMPILED) + 1)))
+	@CURRENT_PERCENT=$$(expr $(COMPILED) \* 100 / $(TOTAL_FILES)); \
+	printf "\r\033[K$(YELLOW)[%3d%%] Compiling: $<$(RESET)" $$CURRENT_PERCENT
 endef
 
+# **************************************************************************** #
+#                                   TARGETS                                    #
+# **************************************************************************** #
 all: $(NAME)
 
-$(NAME): $(OBJS_DIR) $(OBJS)
-	@echo "$(BOLD)$(LIGHT_BLUE)Compiling $(NAME)...$(RESET)"
-	@$(CC) $(OBJS) $(LIBS) -o $(NAME)
+$(NAME): $(OBJS)
+	@echo "\n$(BOLD)$(LIGHT_BLUE)Linking $(NAME)...$(RESET)"
+	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 	@echo "$(BOLD)$(LIGHT_BLUE)$(NAME) created successfully!$(RESET)"
 
-$(OBJS_DIR)/%.o: $(SRCS_DIR)/%.c | $(OBJS_DIR)
-	@$(progress)
+# Compile rule for srcs/*.c -> objs/*.o
+$(OBJS_DIR)/%.o: $(SRCS_DIR)/%.c
+	$(progress)
+	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-$(OBJS_DIR):
-	@mkdir -p $(OBJS_DIR)
-	@mkdir -p $(OBJS_DIR)/utils
+# Compile rule for srcs/utils/*.c -> objs/utils/*.o
+$(OBJS_DIR)/utils/%.o: $(UTILS_DIR)/%.c
+	@$(progress)
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
 
 clean:
-	@echo "$(BOLD)$(LIGHT_BLUE)Cleaning objects...$(RESET)"
-	@$(RM) $(OBJS) $(OBJS_DIR)
+	@echo "$(BOLD)$(LIGHT_BLUE)Cleaning object files...$(RESET)"
+	@$(RM) $(OBJS_DIR)
 	@echo "$(BOLD)$(LIGHT_BLUE)Objects cleaned!$(RESET)"
 
-fclean:
-	@echo "$(BOLD)$(LIGHT_BLUE)Full clean...$(RESET)"
-	@$(RM) $(OBJS) $(OBJS_DIR) $(NAME)
+fclean: clean
+	@echo "$(BOLD)$(LIGHT_BLUE)Removing $(NAME)...$(RESET)"
+	@$(RM) $(NAME)
 	@echo "$(BOLD)$(LIGHT_BLUE)Full clean complete!$(RESET)"
 
 re: fclean all
 
-.PHONY: all clean fclean re
-
 run: $(NAME)
+	@echo "Running ./$(NAME) ..."
 	@./$(NAME)
 
 valgrind: $(NAME)
 	@valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(NAME)
 
-.PHONY: run valgrind
+.PHONY: all clean fclean re run valgrind
