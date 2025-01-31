@@ -132,7 +132,6 @@ void    philo_set(t_table *table)
     while (index < table->philo_nbr)
     {
         philo = &table->philos[index];
-        ft_mutex_init(&philo->philo_mutex);
         ft_thread_create(&philo->thread_id, philo_routine, philo);
         index++;
     }

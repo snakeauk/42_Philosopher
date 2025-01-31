@@ -21,11 +21,15 @@ long    init_interval(t_table *table)
 long    set_eat_time(t_philo *philo)
 {
     t_table *table;
+    long    philo_nbr;
     long    eat_time;
 
     eat_time = 0;
+    if (!philo)
+        return (eat_time);
     table = philo->table;
-    if (table->philo_nbr % 2 == 0)
+    philo_nbr = table->philo_nbr;
+    if (philo_nbr % 2 == 0)
     {
         if (philo->id % 2 == 0)
             eat_time = table->time_to_eat;
@@ -65,10 +69,10 @@ void    init_philo_values(t_table *table)
         philo->meals_counter = 0;
         philo->last_meal_time = 0;
         philo->last_sleep_time = 0;
-        philo->next_eat_time = set_eat_time(philo);
         philo->state = SLEEPING;
         philo->is_set = false;
         philo->table = table;
+        philo->next_eat_time = set_eat_time(philo);
         if (index == 0)
         {
             philo->first_fork = &table->forks[table->philo_nbr - 1];
@@ -89,7 +93,9 @@ void init_table(t_table *table)
     table->philos = (t_philo *)malloc(sizeof(t_philo) * table->philo_nbr);
     if (!table->forks || !table->philos)
         error_exit("Error: malloc failed", table);
-    table->interval = init_interval(table);
     init_philo_values(table);
+    table->interval = init_interval(table);
     init_forks(table);
+    table->monitor.is_dead = false;
+    table->monitor.simulation_continue = false;
 }

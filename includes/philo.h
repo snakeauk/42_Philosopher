@@ -58,12 +58,12 @@ typedef struct s_table
     long        philo_nbr;
     long        time_to_die;
     long        time_to_eat;
-    long        time_to_sleep;
     long        limit_meals;
+    long        time_to_sleep;
     long        start_time;
     long        interval;
-    t_monitor   monitor;
     t_philo     *philos;
+    t_monitor   monitor;
     t_fork      *forks;
 }               t_table;
 
@@ -81,7 +81,6 @@ int    init_arg(t_table *table, char **argv);
 // init_table.c
 void init_table(t_table *table);
 
-
 // simulation.c
 void    simulation(t_table *table);
 
@@ -93,11 +92,11 @@ void        free_table(t_table *table);
 
 // philo.c
 int     philo_log(t_philo *philo, char *message);
+
 void    philo_set(t_table *table);
+
 
 // monitor.c
 void    *monitor_set(t_table *table);
-
-
 
 #endif

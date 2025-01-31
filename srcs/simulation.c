@@ -13,11 +13,10 @@ void    simulation_wait(t_table *table)
     index = 0;
     while (index < table->philo_nbr)
     {
-        pthread_mutex_destroy(&table->philos[index].philo_mutex);
-        pthread_mutex_destroy(&table->forks[index].fork);
+        ft_thread_join(table->philos[index].thread_id);
         index++;
     }
-    pthread_mutex_destroy(&table->monitor.monitor_mutex);
+    ft_thread_join(table->monitor.thread_id);
 }
 
 void    simulation(t_table *table)

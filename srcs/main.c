@@ -13,6 +13,35 @@ int error_message(char *message)
     return (ft_fputs(message, STDERR_FILENO));
 }
 
+int init_mutex(t_table *table)
+{
+    int index;
+
+    index = 0;
+    while (index < table->philo_nbr)
+    {
+        ft_mutex_init(&table->philos[index].philo_mutex);
+        ft_mutex_init(&table->philos[index].philo_mutex);
+        index++;
+    }
+    ft_mutex_init(&table->monitor.monitor_mutex);
+    return (EXIT_SUCCESS);
+}
+
+void mutex_destroy(t_table *table)
+{
+    int index;
+
+    index = 0;
+    while (index < table->philo_nbr)
+    {
+        pthread_mutex_destroy(&table->philos[index].philo_mutex);
+        pthread_mutex_destroy(&table->philos[index].philo_mutex);
+        index++;
+    }
+    pthread_mutex_destroy(&table->monitor.monitor_mutex);
+}
+
 int main(int argc, char **argv)
 {
     t_table *table;
@@ -31,8 +60,9 @@ int main(int argc, char **argv)
         return (EXIT_FAILURE);
     // printf("%ld\n", table->philo_nbr);
     init_table(table);
-    // init_mutex(table);
+    init_mutex(table);
     simulation(table);
+    mutex_destroy(table);
     free_table(table);
     return (0);
 }

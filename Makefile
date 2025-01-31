@@ -7,7 +7,7 @@ NAME        = philo
 
 # Compiler and Flags
 CC          = cc
-CFLAGS      = -Wall -Wextra -Werror -pthread
+CFLAGS      = -Wall -Wextra -Werror -pthread -g
 
 # Directories
 MAKEFLAGS	+=	--no-print-directory

@@ -36,6 +36,7 @@ void    check_start(t_table *table)
     bool    start;
 
     index = 0;
+    start = true;
     while (start)
     {
         start = false;
@@ -75,7 +76,6 @@ void    *monitor_set(t_table *table)
     t_monitor *monitor;
 
     monitor = &table->monitor;
-    ft_mutex_init(&monitor->monitor_mutex);
     ft_thread_create(&monitor->thread_id, monitor_routine, table);
     return (NULL);
 }
