@@ -64,9 +64,9 @@ endef
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	@echo "\n$(BOLD)$(LIGHT_BLUE)Linking $(NAME)...$(RESET)"
+	@echo "\r\033[K$(BOLD)$(LIGHT_BLUE)Linking $(NAME)...$(RESET)"
 	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
-	@echo "$(BOLD)$(LIGHT_BLUE)$(NAME) created successfully!$(RESET)"
+	@echo "\r\033[K$(BOLD)$(LIGHT_BLUE)$(NAME) created successfully!$(RESET)"
 
 # Compile rule for srcs/*.c -> objs/*.o
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.c
@@ -82,19 +82,19 @@ $(OBJS_DIR)/utils/%.o: $(UTILS_DIR)/%.c
 
 
 clean:
-	@echo "$(BOLD)$(LIGHT_BLUE)Cleaning object files...$(RESET)"
+	@echo "\r\033[K$(BOLD)$(LIGHT_BLUE)Cleaning object files...$(RESET)"
 	@$(RM) $(OBJS_DIR)
-	@echo "$(BOLD)$(LIGHT_BLUE)Objects cleaned!$(RESET)"
+	@echo "\r\033[K$(BOLD)$(LIGHT_BLUE)Objects cleaned!$(RESET)"
 
-fclean: clean
-	@echo "$(BOLD)$(LIGHT_BLUE)Removing $(NAME)...$(RESET)"
-	@$(RM) $(NAME)
-	@echo "$(BOLD)$(LIGHT_BLUE)Full clean complete!$(RESET)"
+fclean:
+	@echo "\r\033[K$(BOLD)$(LIGHT_BLUE)Removing $(NAME)...$(RESET)"
+	@$(RM) $(NAME) $(OBJS_DIR)
+	@echo "\r\033[K$(BOLD)$(LIGHT_BLUE)Full clean complete!$(RESET)"
 
 re: fclean all
 
 run: $(NAME)
-	@echo "Running ./$(NAME) ..."
+	@echo "\r\033[KRunning ./$(NAME) ..."
 	@./$(NAME)
 
 valgrind: $(NAME)
