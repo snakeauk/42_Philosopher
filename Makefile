@@ -55,7 +55,7 @@ COMPILED    = 0
 define progress
 	@$(eval COMPILED=$(shell echo $$(expr $(COMPILED) + 1)))
 	@CURRENT_PERCENT=$$(expr $(COMPILED) \* 100 / $(TOTAL_FILES)); \
-	printf "\r\033[K$(YELLOW)[%3d%%] Compiling: $<$(RESET)" $$CURRENT_PERCENT
+	printf "\033[K$(YELLOW)[%3d%%] Compiling: $<$(RESET)\r" $$CURRENT_PERCENT
 endef
 
 # **************************************************************************** #
@@ -64,13 +64,13 @@ endef
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	@echo "\r\033[K$(BOLD)$(LIGHT_BLUE)Linking $(NAME)...$(RESET)"
+	@printf "\033[K$(BOLD)$(LIGHT_BLUE)Compiling $(NAME)...$(RESET)"
 	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
-	@echo "\r\033[K$(BOLD)$(LIGHT_BLUE)$(NAME) created successfully!$(RESET)"
+	@printf "\r\033[K$(BOLD)$(LIGHT_BLUE)$(NAME) created successfully!$(RESET)\n"
 
 # Compile rule for srcs/*.c -> objs/*.o
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.c
-	$(progress)
+	@$(progress)
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -82,22 +82,25 @@ $(OBJS_DIR)/utils/%.o: $(UTILS_DIR)/%.c
 
 
 clean:
-	@echo "\r\033[K$(BOLD)$(LIGHT_BLUE)Cleaning object files...$(RESET)"
+	@printf "\033[K$(BOLD)$(LIGHT_BLUE)Cleaning object files...$(RESET)"
 	@$(RM) $(OBJS_DIR)
-	@echo "\r\033[K$(BOLD)$(LIGHT_BLUE)Objects cleaned!$(RESET)"
+	@printf "\r\033[K$(BOLD)$(LIGHT_BLUE)Objects cleaned!$(RESET)\n"
 
 fclean:
-	@echo "\r\033[K$(BOLD)$(LIGHT_BLUE)Removing $(NAME)...$(RESET)"
+	@printf "\033[K$(BOLD)$(LIGHT_BLUE)Removing $(NAME)...$(RESET)"
 	@$(RM) $(NAME) $(OBJS_DIR)
-	@echo "\r\033[K$(BOLD)$(LIGHT_BLUE)Full clean complete!$(RESET)"
+	@printf "\r\033[K$(BOLD)$(LIGHT_BLUE)Full clean complete!$(RESET)\n"
 
 re: fclean all
 
+.PHONY: all clean fclean re
+
 run: $(NAME)
-	@echo "\r\033[KRunning ./$(NAME) ..."
-	@./$(NAME)
+	./$(NAME) 5 800 200 200
 
 valgrind: $(NAME)
 	@valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(NAME)
 
-.PHONY: all clean fclean re run valgrind
+.PHONY: run valgrind
+
+
