@@ -9,7 +9,7 @@ bool    is_continue(t_table *table)
     is_dead = false;
     is_end = false;
     index = 0;
-    while (!is_dead && is_end && index < table->philo_nbr)
+    while (!is_dead && !is_end && index < table->philo_nbr)
     {
         ft_mutex_lock(&table->philos[index].philo_mutex);
         if (table->philos[index].state == DEAD)
