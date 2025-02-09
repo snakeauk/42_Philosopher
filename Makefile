@@ -15,17 +15,14 @@ MAKEFLAGS	+=	--no-print-directory
 # srcs
 SRCS_DIR	=	./srcs
 UTILS_DIR	=	$(SRCS_DIR)/utils
+INIT_DIR	=	$(SRCS_DIR)/init
+SIM_DIR		=	$(SRCS_DIR)/simulation
 UTILS_SRCS	=	$(wildcard $(UTILS_DIR)/*.c)
-MAN_SRCS	=	$(SRCS_DIR)/check.c \
-				$(SRCS_DIR)/free.c \
-				$(SRCS_DIR)/init_arg.c \
-				$(SRCS_DIR)/init_mutex.c \
-				$(SRCS_DIR)/init_table.c \
-				$(SRCS_DIR)/main.c \
-				$(SRCS_DIR)/monitor.c \
-				$(SRCS_DIR)/philo.c \
-				$(SRCS_DIR)/simulation.c
-SRCS		=	$(UTILS_SRCS) $(MAN_SRCS)
+INIT_SRCS	=	$(wildcard $(INIT_DIR)/*.c)
+SIM_SRCS	=	$(wildcard $(SIM_DIR)/*.c)
+MAN_SRCS	=	$(SRCS_DIR)/free.c \
+				$(SRCS_DIR)/main.c
+SRCS		=	$(UTILS_SRCS) $(INIT_SRCS) $(SIM_SRCS) $(MAN_SRCS)
 
 # object
 OBJS_DIR	=	./objs
@@ -80,6 +77,15 @@ $(OBJS_DIR)/utils/%.o: $(UTILS_DIR)/%.c
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
+$(OBJS_DIR)/init/%.o: $(INIT_DIR)/%.c
+	@$(progress)
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+$(OBJS_DIR)/simulation/%.o: $(SIM_DIR)/%.c
+	@$(progress)
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
 	@printf "\033[K$(BOLD)$(LIGHT_BLUE)Cleaning object files...$(RESET)"
