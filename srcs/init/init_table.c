@@ -69,7 +69,7 @@ void    init_philo_values(t_table *table)
         philo->meals_counter = 0;
         philo->last_meal_time = 0;
         philo->last_sleep_time = 0;
-        philo->state = SLEEPING;
+        philo->state = THINKING;
         philo->is_set = false;
         philo->table = table;
         philo->next_eat_time = set_eat_time(philo);

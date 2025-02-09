@@ -95,7 +95,7 @@ void    wait_start(t_table *table)
     t_monitor *monitor;
 
     monitor = &table->monitor;
-    while (get_bool(&monitor->monitor_mutex, &monitor->simulation_continue))
+    while (get_bool(&monitor->monitor_mutex, &monitor->simulation_continue) == false)
         ;
 }
 
@@ -108,7 +108,7 @@ void    *philo_routine(void *arg)
     table = philo->table;
     set_bool(&philo->philo_mutex, &philo->is_set, true);
     wait_start(table);
-    while (table->monitor.simulation_continue)
+    while (get_bool(&table->monitor.monitor_mutex, &table->monitor.simulation_continue))
     {
         is_dead(philo);
         if (philo->state == THINKING)

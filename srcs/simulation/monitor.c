@@ -9,23 +9,22 @@ bool    is_continue(t_table *table)
     is_dead = false;
     is_end = false;
     index = 0;
-    while (!is_dead && is_end && index < table->philo_nbr)
+    while (!is_dead && !is_end && index < table->philo_nbr)
     {
         ft_mutex_lock(&table->philos[index].philo_mutex);
         if (table->philos[index].state == DEAD)
         {
             is_dead = true;
-            philo_log(&table->philos[index], "is dead");
-            ft_mutex_unlock(&table->philos[index].philo_mutex);
-            break;
+            printf("%ld %d is dead\n", get_time("ms") - table->start_time, table->philos[index].id);
         }
         if (table->limit_meals != -1 && table->philos[index].meals_counter >= table->limit_meals)
             is_end = true;
         ft_mutex_unlock(&table->philos[index].philo_mutex);
+        if (is_end == true || is_dead == true)
+            return (false);
+        index++;
     }
-    if (!is_dead || !is_end)
-        return (true);
-    return (false);
+    return (true);
 }
 
 void    check_start(t_table *table)
@@ -53,6 +52,7 @@ void    check_start(t_table *table)
         }
     }
     table->start_time = get_time("ms");
+    set_bool(&table->monitor.monitor_mutex, &table->monitor.simulation_continue, true);
 }
 
 void    *monitor_routine(void *arg)
@@ -79,4 +79,3 @@ void    *monitor_set(t_table *table)
     ft_thread_create(&monitor->thread_id, monitor_routine, table);
     return (NULL);
 }
-
