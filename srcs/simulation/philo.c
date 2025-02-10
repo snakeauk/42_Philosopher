@@ -38,7 +38,7 @@ void pick_fork(t_philo *philo)
     philo_print(philo, "has taken a fork");
 }
 
-void philo_eat(t_philo *philo)
+void philo_move(t_philo *philo)
 {
     philo_print(philo, "is eating");
     ft_mutex_lock(&philo->table->m_eat);
@@ -48,6 +48,9 @@ void philo_eat(t_philo *philo)
     ft_usleep(philo->table->time_to_eat);
     ft_mutex_unlock(&philo->right->fork);
     ft_mutex_unlock(&philo->left->fork);
+    philo_print(philo, "is sleeping");
+    ft_usleep(philo->table->time_to_sleep);
+    philo_print(philo, "is thinking");
 }
 
 void *philo_routine(void *arg)
@@ -62,10 +65,7 @@ void *philo_routine(void *arg)
     {
         pthread_create(&monitor, NULL, check_dead, philo);
         pick_fork(philo);
-        philo_eat(philo);
-        philo_print(philo, "is sleeping");
-        ft_usleep(philo->table->time_to_sleep);
-        philo_print(philo, "is thinking");
+        philo_move(philo);
         pthread_detach(monitor);
         if (philo->meal_count == philo->table->limit_meals)
         {
