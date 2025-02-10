@@ -19,19 +19,3 @@ long    get_time(char *timecode)
         ft_fputs("Error: get_time: invalid argment\n", STDERR_FILENO);
     return (-1);
 }
-// int main(int argc, char **argv)
-// {
-//     long    time;
-//     if (argc != 2)
-//     {
-//         printf("Usage: invalid argmeant\n");
-//         return (EXIT_FAILURE);
-//     }
-//     while (1)
-//     {
-//         time = get_time(argv[1]);
-//         printf("time: %ld\n", time);
-//         usleep(10000000);
-//     }
-//     return (EXIT_SUCCESS);
-// }
