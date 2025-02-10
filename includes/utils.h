@@ -13,6 +13,9 @@
 // time
 long    get_time(char *timecode);
 
+// usleep
+void ft_usleep(long time);
+
 // thread
 typedef pthread_mutex_t t_mutex;
 int     ft_thread_create(pthread_t *thread, void *(*start_routine)(void *), void *arg);

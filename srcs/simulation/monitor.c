@@ -1,81 +1,21 @@
 #include "philo.h"
 
-bool    is_continue(t_table *table)
+void *check_dead(void *arg)
 {
-    bool    is_dead;
-    bool    is_end;
-    int     index;
-
-    is_dead = false;
-    is_end = false;
-    index = 0;
-    while (!is_dead && !is_end && index < table->philo_nbr)
-    {
-        ft_mutex_lock(&table->philos[index].philo_mutex);
-        if (table->philos[index].state == DEAD)
-        {
-            is_dead = true;
-            printf("%ld %d is dead\n", get_time("ms") - table->start_time, table->philos[index].id);
-        }
-        if (table->limit_meals != -1 && table->philos[index].meals_counter >= table->limit_meals)
-            is_end = true;
-        ft_mutex_unlock(&table->philos[index].philo_mutex);
-        if (is_end == true || is_dead == true)
-            return (false);
-        index++;
-    }
-    return (true);
-}
-
-void    check_start(t_table *table)
-{
-    int     index;
     t_philo *philo;
-    bool    status;
-    bool    start;
 
-    index = 0;
-    start = true;
-    while (start)
+    philo = (t_philo *)arg;
+    ft_usleep(philo->table->time_to_die + 1);
+    ft_mutex_lock(&philo->table->m_eat);
+    ft_mutex_lock(&philo->table->m_stop);
+    if (is_continue(philo, CONTINUE) && get_time("ms") - philo->last_eat >= philo->table->time_to_die)
     {
-        start = false;
-        while (index < table->philo_nbr)
-        {
-            status = false;
-            philo = &table->philos[index];
-            ft_mutex_lock(&philo->philo_mutex);
-            status = philo->is_set;
-            if (status == false)
-                start = true;
-            ft_mutex_unlock(&philo->philo_mutex);
-            index++;
-        }
+        ft_mutex_unlock(&philo->table->m_eat);
+        ft_mutex_unlock(&philo->table->m_stop);
+        philo_print(philo, "died");
+        is_continue(philo, STOP);
     }
-    table->start_time = get_time("ms");
-    set_bool(&table->monitor.monitor_mutex, &table->monitor.simulation_continue, true);
-}
-
-void    *monitor_routine(void *arg)
-{
-    t_table *table;
-    t_monitor *monitor;
-
-    table = (t_table *)arg;
-    monitor = &table->monitor;
-    check_start(table);
-    while (get_bool(&monitor->monitor_mutex, &monitor->simulation_continue))
-    {
-        usleep(1000);
-        set_bool(&table->monitor.monitor_mutex, &table->monitor.simulation_continue, is_continue(table));
-    }
-    return (NULL);
-}
-
-void    *monitor_set(t_table *table)
-{
-    t_monitor *monitor;
-
-    monitor = &table->monitor;
-    ft_thread_create(&monitor->thread_id, monitor_routine, table);
+    ft_mutex_unlock(&philo->table->m_eat);
+    ft_mutex_unlock(&philo->table->m_stop);
     return (NULL);
 }

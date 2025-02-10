@@ -21,6 +21,7 @@ UTILS_SRCS	=	$(wildcard $(UTILS_DIR)/*.c)
 INIT_SRCS	=	$(wildcard $(INIT_DIR)/*.c)
 SIM_SRCS	=	$(wildcard $(SIM_DIR)/*.c)
 MAN_SRCS	=	$(SRCS_DIR)/free.c \
+				$(SRCS_DIR)/error.c \
 				$(SRCS_DIR)/main.c
 SRCS		=	$(UTILS_SRCS) $(INIT_SRCS) $(SIM_SRCS) $(MAN_SRCS)
 

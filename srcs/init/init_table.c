@@ -1,62 +1,19 @@
 #include "philo.h"
 
-long    init_interval(t_table *table)
-{
-    long interval;
-    long philo_nbr;
-    long time_to_eat;
-    long time_to_sleep;
-    
-    philo_nbr = table->philo_nbr;
-    time_to_eat = table->time_to_eat;
-    time_to_sleep = table->time_to_sleep;
-    if ((philo_nbr / 2) == 0)
-        return (time_to_eat + time_to_sleep);
-    interval = time_to_eat * 2;
-    if (interval < time_to_eat + time_to_sleep)
-        return (time_to_eat + time_to_sleep);
-    return (interval);
-}
-
-long    set_eat_time(t_philo *philo)
-{
-    t_table *table;
-    long    philo_nbr;
-    long    eat_time;
-
-    eat_time = 0;
-    if (!philo)
-        return (eat_time);
-    table = philo->table;
-    philo_nbr = table->philo_nbr;
-    if (philo_nbr % 2 == 0)
-    {
-        if (philo->id % 2 == 0)
-            eat_time = table->time_to_eat;
-        else
-            eat_time = 0;
-    }
-    else
-    {
-        eat_time = table->time_to_eat;
-    }
-    return (eat_time);
-}
-
-void    init_forks(t_table *table)
+void init_forks(t_table *table)
 {
     int index;
 
     index = 0;
     while (index < table->philo_nbr)
     {
-        table->forks[index].fork_id = index;
+        table->forks[index].id = index + 1;
         ft_mutex_init(&table->forks[index].fork);
         index++;
     }
 }
 
-void    init_philo_values(t_table *table)
+void init_philo(t_table *table)
 {
     int index;
     t_philo *philo;
@@ -66,36 +23,32 @@ void    init_philo_values(t_table *table)
     {
         philo = &table->philos[index];
         philo->id = index + 1;
-        philo->meals_counter = 0;
-        philo->last_meal_time = 0;
-        philo->last_sleep_time = 0;
-        philo->state = THINKING;
-        philo->is_set = false;
-        philo->table = table;
-        philo->next_eat_time = set_eat_time(philo);
-        if (index == 0)
-        {
-            philo->first_fork = &table->forks[table->philo_nbr - 1];
-            philo->second_fork = &table->forks[index];
-        }
+        philo->last_eat = 0;
+        philo->left = &table->forks[index];
+        if (philo->id == table->philo_nbr)
+            philo->right = &table->forks[0];
         else
-        {
-            philo->first_fork = &table->forks[index - 1];
-            philo->second_fork = &table->forks[index];
-        }
+            philo->right = &table->forks[index + 1];
+        philo->meal_count = 0;
+        philo->table = table;
         index++;
     }
 }
 
-void init_table(t_table *table)
+int init_table(t_table *table)
 {
-    table->forks = (t_fork *)malloc(sizeof(t_fork) * table->philo_nbr);
+    table->stop = 0;
     table->philos = (t_philo *)malloc(sizeof(t_philo) * table->philo_nbr);
-    if (!table->forks || !table->philos)
-        error_exit("Error: malloc failed", table);
-    init_philo_values(table);
-    table->interval = init_interval(table);
+    if (!table->philos)
+        return (EXIT_FAILURE);
+    table->forks = (t_fork *)malloc(sizeof(t_fork) * table->philo_nbr);
+    if (!table->forks)
+        return (EXIT_FAILURE);
     init_forks(table);
-    table->monitor.is_dead = false;
-    table->monitor.simulation_continue = false;
+    init_philo(table);
+    ft_mutex_init(&table->print_mutex);
+    ft_mutex_init(&table->m_stop);
+    ft_mutex_init(&table->m_eat);
+    ft_mutex_init(&table->continue_mutex);
+    return (EXIT_SUCCESS);
 }
