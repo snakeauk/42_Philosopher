@@ -24,6 +24,8 @@ void init_philo(t_table *table)
         philo = &table->philos[index];
         philo->id = index + 1;
         philo->last_eat = 0;
+        philo->status = THINKING;
+        philo->is_set = false;
         philo->left = &table->forks[index];
         if (philo->id == table->philo_nbr)
             philo->right = &table->forks[0];
@@ -31,6 +33,7 @@ void init_philo(t_table *table)
             philo->right = &table->forks[index + 1];
         philo->meal_count = 0;
         philo->table = table;
+        ft_mutex_init(&philo->mutex);
         index++;
     }
 }
@@ -46,9 +49,11 @@ int init_table(t_table *table)
         return (EXIT_FAILURE);
     init_forks(table);
     init_philo(table);
+    table->monitor.is_set = false;
     ft_mutex_init(&table->print_mutex);
     ft_mutex_init(&table->m_stop);
     ft_mutex_init(&table->m_eat);
     ft_mutex_init(&table->continue_mutex);
+    ft_mutex_init(&table->monitor.mutex);
     return (EXIT_SUCCESS);
 }
