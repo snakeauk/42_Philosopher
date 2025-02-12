@@ -70,7 +70,6 @@ typedef struct s_table
     t_mutex m_stop;
     t_mutex m_eat;
     t_mutex continue_mutex;
-    // pthread_t monitor_thread;
 }               t_table;
 
 int check_input(int argc, char **argv);

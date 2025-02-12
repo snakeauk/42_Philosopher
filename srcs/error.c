@@ -5,6 +5,7 @@ void    error_exit(char *message, t_table *table)
     if (table)
         free_table(table);
     error_message(message);
+    ft_fputs("\n", STDERR_FILENO);
     exit(EXIT_FAILURE);
 }
 

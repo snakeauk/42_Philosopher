@@ -6,9 +6,9 @@ int    init_arg(t_table *table, char **argv)
 
     status = EXIT_SUCCESS;
     table->philo_nbr = ft_atol(argv[1]);
-    if (table->philo_nbr < 1)
+    if (table->philo_nbr < 1 || table->philo_nbr > 200)
     {
-        error_exit("Error: number of philosophers must be at least 1", table);
+        error_exit("Error: invalid number of philosophers", table);
         status = EXIT_FAILURE;
     }
     table->time_to_die = ft_atol(argv[2]);
