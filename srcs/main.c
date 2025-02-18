@@ -14,6 +14,7 @@ int main(int argc, char **argv)
     if (init_arg(&table, argv) != EXIT_SUCCESS)
         return (EXIT_FAILURE);
     init_table(&table);
+	// debug_forks(&table);
     simulation(&table);
     free_table(&table);
     return (0);

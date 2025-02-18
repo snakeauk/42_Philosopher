@@ -2,58 +2,70 @@
 
 void init_forks(t_table *table)
 {
-    int index;
+	int	index;
 
-    index = 0;
-    while (index < table->philo_nbr)
-    {
-        table->forks[index].id = index + 1;
-        ft_mutex_init(&table->forks[index].fork);
-        index++;
-    }
+	index = 0;
+	while (index < table->philo_nbr)
+	{
+		table->forks[index].id = index + 1;
+		ft_mutex_init(&table->forks[index].fork);
+		index++;
+	}
 }
 
-void init_philo(t_table *table)
+static void	fork_set(t_philo *philo, t_table *table)
 {
-    int index;
-    t_philo *philo;
+	t_fork	*tmp;
+	t_fork	*forks;
 
-    index = 0;
-    while (index < table->philo_nbr)
-    {
-        philo = &table->philos[index];
-        philo->id = index + 1;
-        philo->last_eat = 0;
-        philo->status = THINKING;
-        philo->is_set = false;
-        philo->left = &table->forks[index];
-        if (philo->id == table->philo_nbr)
-            philo->right = &table->forks[0];
-        else
-            philo->right = &table->forks[index + 1];
-        philo->meal_count = 0;
-        philo->table = table;
-        ft_mutex_init(&philo->mutex);
-        index++;
-    }
+	forks = table->forks;
+	philo->first = &forks[philo->id - 1];
+	if (philo->id == table->philo_nbr)
+		philo->second = &forks[0];
+	else
+		philo->second = &forks[philo->id];
+	if (philo->id % 2 == 0)
+	{
+		tmp = philo->first;
+		philo->first = philo->second;
+		philo->second = tmp;
+	}
+}
+
+void	init_philo(t_table *table)
+{
+	int		index;
+	t_philo	*philo;
+
+	index = 0;
+	while (index < table->philo_nbr)
+	{
+		philo = &table->philos[index];
+		philo->id = index + 1;
+		philo->status = THINKING;
+		fork_set(philo, table);
+		philo->meal_count = 0;
+		philo->table = table;
+		philo->is_full = false;
+		philo->eat_last_time = 0;
+		philo->is_set = false;
+		ft_mutex_init(&philo->mutex);
+		index++;
+	}
 }
 
 int init_table(t_table *table)
 {
-    table->stop = 0;
-    table->philos = (t_philo *)malloc(sizeof(t_philo) * table->philo_nbr);
-    if (!table->philos)
-        return (EXIT_FAILURE);
-    table->forks = (t_fork *)malloc(sizeof(t_fork) * table->philo_nbr);
-    if (!table->forks)
-        return (EXIT_FAILURE);
-    init_forks(table);
-    init_philo(table);
-    table->monitor.is_set = false;
-    ft_mutex_init(&table->print_mutex);
-    ft_mutex_init(&table->m_stop);
-    ft_mutex_init(&table->m_eat);
-    ft_mutex_init(&table->continue_mutex);
-    ft_mutex_init(&table->monitor.mutex);
-    return (EXIT_SUCCESS);
+	table->philos = (t_philo *)malloc(sizeof(t_philo) * table->philo_nbr);
+	if (!table->philos)
+		return (EXIT_FAILURE);
+	table->forks = (t_fork *)malloc(sizeof(t_fork) * table->philo_nbr);
+	if (!table->forks)
+		return (EXIT_FAILURE);
+	init_forks(table);
+	init_philo(table);
+	ft_mutex_init(&table->print_mutex);
+	ft_mutex_init(&table->monitor.mutex);
+	table->monitor.is_stop = false;
+	return (EXIT_SUCCESS);
 }

@@ -23,7 +23,9 @@ SIM_SRCS	=	$(wildcard $(SIM_DIR)/*.c)
 MAN_SRCS	=	$(SRCS_DIR)/free.c \
 				$(SRCS_DIR)/error.c \
 				$(SRCS_DIR)/main.c
-SRCS		=	$(UTILS_SRCS) $(INIT_SRCS) $(SIM_SRCS) $(MAN_SRCS)
+
+DEBUG_SRCS	=	$(SRCS_DIR)/debug.c
+SRCS		=	$(UTILS_SRCS) $(INIT_SRCS) $(SIM_SRCS) $(MAN_SRCS) $(DEBUG_SRCS)
 
 # object
 OBJS_DIR	=	./objs

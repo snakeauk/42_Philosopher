@@ -1,44 +1,38 @@
 #include "philo.h"
 
-void    simulation_wait(t_table *table)
+void	philo_set(t_table *table)
 {
-    int index;
+	int index;
 
-    index = 0;
-    ft_thread_join(table->monitor.monitor_thread);
-    while (index < table->philo_nbr)
-    {
-        ft_thread_join(table->philos[index].thread);
-        index++;
-    }
+	index = 0;
+	while (index < table->philo_nbr)
+	{
+		ft_thread_create(&table->philos[index].thread, philo, &table->philos[index]);
+		index++;
+	}
 }
 
-void destroy_mutex(t_table *table)
+void	monitor_set(t_table *table)
 {
-    int index;
-
-    index = 0;
-    while (index < table->philo_nbr)
-    {
-        pthread_mutex_destroy(&table->philos[index].mutex);
-        pthread_mutex_destroy(&table->forks[index].fork);
-        index++;
-    }
-    pthread_mutex_destroy(&table->print_mutex);
-    pthread_mutex_destroy(&table->m_stop);
-    pthread_mutex_destroy(&table->m_eat);
-    pthread_mutex_destroy(&table->continue_mutex);
+	ft_thread_create(&table->monitor.thread, monitor, table);
 }
 
-void    monitor_create(t_table *table)
+void	join_threads(t_table *table)
 {
-    ft_thread_create(&table->monitor.monitor_thread, check_dead, table);
+	int index;
+
+	index = 0;
+	while (index < table->philo_nbr)
+	{
+		ft_thread_join(table->philos[index].thread);
+		index++;
+	}
+	ft_thread_join(table->monitor.thread);
 }
 
-void    simulation(t_table *table)
+void	simulation(t_table *table)
 {
-    monitor_create(table);
-    philo_set(table);
-    simulation_wait(table);
-    destroy_mutex(table);
+	monitor_set(table);
+	philo_set(table);
+	join_threads(table);
 }
