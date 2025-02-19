@@ -21,12 +21,11 @@ void	dead_check(t_philo *philo)
 	long	time;
 	long	time_to_die;
 	long	eat_last_time;
-
+	
 	time = get_time("ms");
 	time_to_die = philo->table->time_to_die;
 	ft_mutex_lock(&philo->mutex);
 	eat_last_time = philo->eat_last_time;
-	ft_mutex_unlock(&philo->mutex);
 	time = time - eat_last_time;
 	if (philo->status != EATING && time > time_to_die)
 	{
@@ -34,6 +33,7 @@ void	dead_check(t_philo *philo)
 		philo_print(philo, "is died");
 		is_continue(philo->table, STOP);
 	}
+	ft_mutex_unlock(&philo->mutex);
 }
 
 bool	full_check(t_table *table)

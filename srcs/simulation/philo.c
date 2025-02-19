@@ -5,11 +5,11 @@ void philo_print(t_philo *philo, char *message)
 	long	time;
 	bool	is_stop;
 
-	time = get_time("ms") - philo->table->start_time;
 	ft_mutex_lock(&philo->table->monitor.mutex);
 	is_stop = philo->table->monitor.is_stop;
 	ft_mutex_unlock(&philo->table->monitor.mutex);
 	ft_mutex_lock(&philo->table->print_mutex);
+	time = get_time("ms") - philo->table->start_time;
 	if (!is_stop)
 		printf("%ld %d %s\n", time, philo->id, message);
 	ft_mutex_unlock(&philo->table->print_mutex);
@@ -21,6 +21,9 @@ void	philo_eat(t_philo *philo)
 	philo_print(philo, "has taken a fork");
 	if (philo->table->philo_nbr == 1)
 	{
+		ft_mutex_lock(&philo->mutex);
+		philo->status = DEAD;
+		ft_mutex_unlock(&philo->mutex);
 		ft_usleep(philo->table->time_to_die);
 		ft_mutex_unlock(&philo->first->fork);
 		return ;
