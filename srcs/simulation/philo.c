@@ -39,8 +39,8 @@ void	philo_eat(t_philo *philo)
 		philo->is_full = true;
 	ft_mutex_unlock(&philo->mutex);
 	ft_usleep(philo->table->time_to_eat);
-	ft_mutex_unlock(&philo->first->fork);
 	ft_mutex_unlock(&philo->second->fork);
+	ft_mutex_unlock(&philo->first->fork);
 }
 
 void	philo_sleep(t_philo *philo)
